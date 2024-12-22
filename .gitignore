@@ -34,7 +34,6 @@ bin/
 gen/
 out/
 
-
 # Flutter/Dart/Pub related
 **/doc/api/
 .dart_tool/
@@ -285,7 +284,6 @@ cmake-build-*/
 
 # End of https://www.gitignore.io/api/flutter,jetbrains,androidstudio
 
-
 # Created by https://www.gitignore.io/api/linux,xcode,macos,android,windows
 # Edit at https://www.gitignore.io/?templates=linux,xcode,macos,android,windows
 
@@ -482,3 +480,7 @@ DerivedData/
 android/local.properties
 example/ios/Flutter/flutter_export_environment.sh
 example/pubspec.lock
+
+# FVM Version Cache
+.fvm/
+flutter_export_environment.sh
