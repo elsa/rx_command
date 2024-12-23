@@ -810,7 +810,7 @@ class RxCommandAsync<TParam, TResult> extends RxCommand<TParam, TResult> {
 class RxCommandStream<TParam, TResult> extends RxCommand<TParam, TResult> {
   StreamProvider<TParam, TResult> _streamProvider;
 
-  StreamSubscription<Notification<TResult>>? _inputStreamSubscription;
+  StreamSubscription<StreamNotification<TResult>>? _inputStreamSubscription;
 
   RxCommandStream._(
       StreamProvider<TParam, TResult> streamProvider,
@@ -876,29 +876,29 @@ class RxCommandStream<TParam, TResult> extends RxCommand<TParam, TResult> {
     var inputStream = _streamProvider(param);
 
     _inputStreamSubscription = inputStream.materialize().listen(
-      (Notification<TResult> notification) {
-        if (notification.isOnData) {
-          _resultsSubject.add(notification.requireData);
+      (StreamNotification<TResult> notification) {
+        if (notification.isData) {
+          _resultsSubject.add(notification.requireDataValue);
           var commandResult =
-              CommandResult(param, notification.requireData, null, true);
+              CommandResult(param, notification.requireDataValue, null, true);
           _commandResultsSubject.add(commandResult);
           RxCommand.loggingHandler?.call(_debugName, commandResult);
 
-          lastResult = notification.requireData;
-        } else if (notification.isOnError) {
+          lastResult = notification.requireDataValue;
+        } else if (notification.isError) {
           if (throwExceptions) {
-            _resultsSubject.addError(notification.errorAndStackTrace!.error);
+            _resultsSubject.addError(notification.errorAndStackTraceOrNull!.error);
             _commandResultsSubject
-                .addError(notification.errorAndStackTrace!.error);
+                .addError(notification.errorAndStackTraceOrNull!.error);
           } else {
             final commandResult = CommandResult<TParam, TResult>(
-                param, null, notification.errorAndStackTrace!.error, false);
+                param, null, notification.errorAndStackTraceOrNull!.error, false);
             _commandResultsSubject.add(commandResult);
             RxCommand.loggingHandler?.call(_debugName, commandResult);
           }
           RxCommand.globalExceptionHandler?.call(_debugName,
-              CommandError(param, notification.errorAndStackTrace!.error));
-        } else if (notification.isOnDone) {
+              CommandError(param, notification.errorAndStackTraceOrNull!.error));
+        } else if (notification.isDone) {
           final commandResult = CommandResult(param, lastResult, null, false);
           _commandResultsSubject.add(commandResult);
 
